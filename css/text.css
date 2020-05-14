@@ -1,0 +1,88 @@
+body {
+	font-family: Verdana, Geneva, sans-serif;
+}
+
+.vcenter{
+	position:absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.hide_overflow{
+	overflow: hidden;
+}
+
+
+.serious {
+	font-family: "Courier New", Courier, monospace;
+	font-weight: bold;
+}
+
+.title_text{
+	font-size: 2.5em;
+	text-align: center;
+}
+
+#query {
+	margin-top: 1vw;
+	margin-left: 1vw;
+	margin-right: 1vw;
+
+	border: 1px solid #dddddd;
+	border-radius: 2px;
+	border-collapse: collapse;
+
+	max-width: 95vw;
+}
+
+.Block {
+	position: relative;
+	border: 1px solid #dddddd;
+	border-radius: 2px;
+	border-collapse: collapse;
+
+	min-height: 4vw;
+	padding-top: 2vw;
+	padding-left: 2vw;
+	max-width: 95vw;
+	padding-bottom: 1.5vw;
+
+	font-size: 1.5em;
+}
+
+.question {
+	margin-top: 1vw;
+	margin-left: 1vw;
+	margin-right: 1vw;
+}
+
+.question:hover {
+	cursor: pointer;
+}
+
+.answer {
+	background-color:#bdc3c7;
+	margin-bottom: 1vw;
+	margin-left: 2vw;
+	margin-right: 1vw;
+
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+	font-weight: bolder;
+  border: 1px solid #dddddd;
+  text-align: center;
+  padding: 8px;
+}
+
+td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}

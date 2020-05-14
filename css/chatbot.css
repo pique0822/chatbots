@@ -1,0 +1,118 @@
+.shown_content{
+	display: block;
+}
+.hidden_content{
+	display: none;
+}
+
+/* Loading Screen */
+
+.loading_text{
+	position: absolute;
+	left:50%;
+	top: 50%;
+	transform: translate(-50%,4vw);
+}
+
+#loading_screen{
+	position: absolute;
+	left:0;
+	top:0;
+	background-color: #2d3436;
+	width: 100%;
+	height: 100%;
+
+	z-index: 2;
+
+}
+.loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: 5vw;
+  height: 5vw;
+  margin: -2.5vw 0 0 -2.5vw;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 4vw;
+  height: 4vw;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#chatbot_title{
+	color: white;
+}
+
+#speechButtonContainer{
+	position: relative;
+	width: 30vw;
+	height: 30vw;
+}
+
+#speechButton {
+	position: absolute;
+	left: 50vw;
+	top: -1vw;
+
+	transform: translateX(-50%);
+	max-width: 25vw;
+	max-height: 25vw;
+	object-fit:fill;
+	width: auto;
+	height: auto;
+}
+
+#speechButton:hover{
+	cursor: pointer;
+}
+
+#query_div{
+	position: relative;
+	width: 100%;
+	height:2em;
+
+	margin-bottom: 1vw;
+}
+#query{
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 30vw;
+	font-size: 1.5em;
+	margin: 0;
+}
+#submit_query{
+	background-color: white;
+	position: absolute;
+	top: 0;
+	left:66%;
+
+	min-width:6vw;
+	height: 100%;
+
+	font-size: 1em;
+	border-radius: 5px;
+}
+
+#show_all{
+	background-color: white;
+	margin-left: 1vw;
+	min-width:6vw;
+
+	font-size: 1em;
+	border-radius: 5px;
+}

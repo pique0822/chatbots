@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<title>New Chatbot</title>
+		<link rel="stylesheet" href="css/text.css">
+		<link rel="stylesheet" href="css/new_chatbot.css">
+	</head>
+	<body class='hide_overflow'>
+		<div class="shown_content" id="loading_screen">
+			<div class="loader"></div>
+			<p class='loading_text' style='color:white;'>Loading</p>
+		</div>
+		<div class="hidden_content" id="main_content">
+			<input type="color" id="favcolor" onchange="change_random_color()"/>
+			<br>
+			<div id="header">
+				<div id="title_container">
+					<input class='title_text' id="chatbot_title" type="text" required></input>
+					<span class='title_text' id="chatbot_id"></span>
+				</div>
+				<div id="language_selection">
+					<p id="language_label">Language</p>
+					<select id="language" onchange="languageChange()">
+						<option value="en">English</option>
+						<option value="es">Espa&#xf1;ol</option>
+					</select>
+				</div>
+			</div>
+			<br>
+			<br>
+			<br>
+			<br>
+			<div id="new_QA">
+				<button id="submit_new" onclick="submitNewQA()">+</button>
+				<input id="new_question" type="text" placeholder="Question"/>
+				<input id="new_answer" type="text" placeholder="Answer"/>
+				<button class="invisible" id="clear_all" onclick="clearAll()">Clear</button>
+			</div>
+			<br>
+			<hr id='hor_bar'>
+			<br>
+			<div id="set_QA">
+			</div>
+			<div>
+				<button class="invisible" id="submit_all" onclick="submitQA()">Done</button>
+			</div>
+			<div id="myModal" class="modal">
+				<div id='popup_load_screen' class='shown_content'>
+					<div id='popup_loader' class='loader'></div>
+					<p id="popup_loading_text" class='loading_text' style='color:white;'>Uploading Chatbot</p>
+				</div>
+				<div id='popup_main_content' class="modal-content hidden_content">
+					<p id='popup_text'></p>
+					<h1 class="serious" id='popup_id'></h1>
+				</div>
+			</div>
+		</div>
+		<!-- The core Firebase JS SDK is always required and must be listed first -->
+		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+
+		<!-- TODO: Add SDKs for Firebase products that you want to use
+		     https://firebase.google.com/docs/web/setup#available-libraries -->
+		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-analytics.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-database.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-auth.js"></script>
+
+		<!-- TensorFlow.js -->
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+
+
+		<script>
+		  // Your web app's Firebase configuration
+		  var firebaseConfig = {
+		    apiKey: "AIzaSyB9ddxl_sk0pOWRC_pmcb8oXw0i0HnLYzg",
+		    authDomain: "hw-chatbot.firebaseapp.com",
+		    databaseURL: "https://hw-chatbot.firebaseio.com",
+		    projectId: "hw-chatbot",
+		    storageBucket: "hw-chatbot.appspot.com",
+		    messagingSenderId: "440067868028",
+		    appId: "1:440067868028:web:ccc810a40f36b3bb6e10f9",
+		    measurementId: "G-LTX5WFDTCN"
+		  };
+		  // Initialize Firebase
+		  firebase.initializeApp(firebaseConfig);
+		  firebase.analytics();
+
+		</script>
+
+		<script src="js/new_chatbot.js"></script>
+	</body>
+</html>

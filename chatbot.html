@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<title>Chatbot</title>
+		<link rel="stylesheet" href="css/text.css">
+		<link rel="stylesheet" href="css/chatbot.css">
+	</head>
+	<body class='hide_overflow'>
+		<div class="shown_content" id="loading_screen">
+			<div class="loader"></div>
+			<p class='loading_text' style='color:white;'>Loading</p>
+		</div>
+		<div class='hidden_content' id='main_content'>
+			<div class='title_text'>
+				<h3 id="chatbot_title">Chatbot Title</h3>
+			</div>
+			<div id='speechButtonContainer'>
+				<img id="speechButton" onmouseup="toggleRecord()" src='imgs/microphone_icon.png' />
+			</div>
+			<div id="query_div"><input id="query" type="text" placeholder="Ask me anything!" /><button id="submit_query" onclick="submitQuery()">Submit</button></div>
+			<br>
+			<button id='show_all' onclick="toggle_questions(true)">Show All</button>
+			<br>
+			<div id="questions"></div>
+		</div>
+
+		<!-- The core Firebase JS SDK is always required and must be listed first -->
+		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+
+		<!-- TODO: Add SDKs for Firebase products that you want to use
+		     https://firebase.google.com/docs/web/setup#available-libraries -->
+		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-analytics.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-database.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-auth.js"></script>
+
+
+		<!-- TensorFlow.js -->
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+
+
+		<script>
+		  // Your web app's Firebase configuration
+		  var firebaseConfig = {
+		    apiKey: "AIzaSyB9ddxl_sk0pOWRC_pmcb8oXw0i0HnLYzg",
+		    authDomain: "hw-chatbot.firebaseapp.com",
+		    databaseURL: "https://hw-chatbot.firebaseio.com",
+		    projectId: "hw-chatbot",
+		    storageBucket: "hw-chatbot.appspot.com",
+		    messagingSenderId: "440067868028",
+		    appId: "1:440067868028:web:ccc810a40f36b3bb6e10f9",
+		    measurementId: "G-LTX5WFDTCN"
+		  };
+		  // Initialize Firebase
+		  firebase.initializeApp(firebaseConfig);
+		  firebase.analytics();
+
+		</script>
+
+		<script src="js/load_chatbot.js"></script>
+	</body>
+</html>

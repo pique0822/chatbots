@@ -313,6 +313,7 @@ if(window.location.href.indexOf('?id=') >= 0 && (window.location.href.length - w
 
       document.getElementById('chatbot_id').value = language_vars[current_language]['chatbot_title'];
 
+      document.getElementById("favcolor").value = random_color;
       set_text_color(random_color);
 		}
 	});

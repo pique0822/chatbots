@@ -5,13 +5,15 @@
 	display: none;
 }
 
+/* MOBILE PHONE */
 /* Loading Screen */
 
 .loading_text{
+	font-size: 1.5em;
 	position: absolute;
 	left:50%;
 	top: 50%;
-	transform: translate(-50%,4vw);
+	transform: translate(-40%,100%);
 }
 
 #loading_screen{
@@ -30,14 +32,14 @@
   left: 50%;
   top: 50%;
   z-index: 2;
-  width: 5vw;
-  height: 5vw;
-  margin: -2.5vw 0 0 -2.5vw;
+  width: 10vw;
+  height: 10vw;
+  margin: -5vw 0 0 -5vw;
   border: 16px solid #f3f3f3;
   border-radius: 50%;
   border-top: 16px solid #3498db;
-  width: 4vw;
-  height: 4vw;
+  width: 9vw;
+  height: 9vw;
   -webkit-animation: spin 2s linear infinite;
   animation: spin 2s linear infinite;
 }
@@ -58,18 +60,19 @@
 
 #speechButtonContainer{
 	position: relative;
-	width: 30vw;
-	height: 30vw;
+	width: 60vw;
+	height: 60vw;
 }
 
 #speechButton {
 	position: absolute;
 	left: 50vw;
 	top: -1vw;
+	max-width: 60vw;
+	max-height: 60vw;
 
 	transform: translateX(-50%);
-	max-width: 25vw;
-	max-height: 25vw;
+
 	object-fit:fill;
 	width: auto;
 	height: auto;
@@ -84,14 +87,14 @@
 	width: 100%;
 	height:2em;
 
+	margin-top: 1vw;
 	margin-bottom: 1vw;
 }
 #query{
 	position: absolute;
 	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 30vw;
+	left: 5%;
+	width: 65vw;
 	font-size: 1.5em;
 	margin: 0;
 }
@@ -99,7 +102,7 @@
 	background-color: white;
 	position: absolute;
 	top: 0;
-	left:66%;
+	right:5%;
 
 	min-width:6vw;
 	height: 100%;
@@ -115,4 +118,188 @@
 
 	font-size: 1em;
 	border-radius: 5px;
+}
+
+.Block {
+	position: relative;
+	border: 1px solid #dddddd;
+	border-radius: 2px;
+	border-collapse: collapse;
+
+	min-height: 20vw;
+	padding-top: 2vw;
+	padding-left: 2vw;
+	max-width: 95vw;
+	padding-bottom: 1.5vw;
+
+	font-size: 1.5em;
+}
+
+.question {
+	margin-top: 1vw;
+	margin-left: 1vw;
+	margin-right: 1vw;
+}
+
+.question:hover {
+	cursor: pointer;
+}
+
+.answer {
+	background-color:#bdc3c7;
+	margin-bottom: 1vw;
+	margin-left: 2vw;
+	margin-right: 1vw;
+
+}
+
+
+@media only screen and (min-width: 768px) {
+	/* DESKTOP */
+
+	/* Loading Screen */
+
+	.loading_text{
+		font-size: 2em;
+		position: absolute;
+		left:50%;
+		top: 50%;
+		transform: translate(-45%,2vw);
+	}
+
+	#loading_screen{
+		position: absolute;
+		left:0;
+		top:0;
+		background-color: #2d3436;
+		width: 100%;
+		height: 100%;
+
+		z-index: 2;
+
+	}
+	.loader {
+	  position: absolute;
+	  left: 50%;
+	  top: 50%;
+	  z-index: 2;
+	  width: 5vw;
+	  height: 5vw;
+	  margin: -2.5vw 0 0 -2.5vw;
+	  border: 16px solid #f3f3f3;
+	  border-radius: 50%;
+	  border-top: 16px solid #3498db;
+	  width: 4vw;
+	  height: 4vw;
+	  -webkit-animation: spin 2s linear infinite;
+	  animation: spin 2s linear infinite;
+	}
+
+	@-webkit-keyframes spin {
+	  0% { -webkit-transform: rotate(0deg); }
+	  100% { -webkit-transform: rotate(360deg); }
+	}
+
+	@keyframes spin {
+	  0% { transform: rotate(0deg); }
+	  100% { transform: rotate(360deg); }
+	}
+
+	#chatbot_title{
+		color: white;
+	}
+
+	#speechButtonContainer{
+		position: relative;
+		width: 30vw;
+		height: 30vw;
+	}
+
+	#speechButton {
+		position: absolute;
+		left: 50vw;
+		top: -1vw;
+
+		transform: translateX(-50%);
+		max-width: 25vw;
+		max-height: 25vw;
+		object-fit:fill;
+		width: auto;
+		height: auto;
+	}
+
+	#speechButton:hover{
+		cursor: pointer;
+	}
+
+	#query_div{
+		position: relative;
+		width: 100%;
+		height:2em;
+
+		margin-bottom: 1vw;
+	}
+	#query{
+		position: absolute;
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 30vw;
+		font-size: 1.5em;
+		margin: 0;
+	}
+	#submit_query{
+		background-color: white;
+		position: absolute;
+		top: 0;
+		left:66%;
+
+		min-width:6vw;
+		height: 100%;
+
+		font-size: 1em;
+		border-radius: 5px;
+	}
+
+	#show_all{
+		background-color: white;
+		margin-left: 1vw;
+		min-width:6vw;
+
+		font-size: 1em;
+		border-radius: 5px;
+	}
+
+	.Block {
+		position: relative;
+		border: 1px solid #dddddd;
+		border-radius: 2px;
+		border-collapse: collapse;
+
+		min-height: 4vw;
+		padding-top: 2vw;
+		padding-left: 2vw;
+		max-width: 95vw;
+		padding-bottom: 1.5vw;
+
+		font-size: 1.5em;
+	}
+
+	.question {
+		margin-top: 1vw;
+		margin-left: 1vw;
+		margin-right: 1vw;
+	}
+
+	.question:hover {
+		cursor: pointer;
+	}
+
+	.answer {
+		background-color:#bdc3c7;
+		margin-bottom: 1vw;
+		margin-left: 2vw;
+		margin-right: 1vw;
+
+	}
 }

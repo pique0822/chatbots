@@ -14,7 +14,7 @@
 .modal {
 	display: none;
 	position: fixed;
-	z-index: 1;
+	z-index: 10;
 	left: 0;
 	top: 0;
 	width: 100%;
@@ -41,14 +41,14 @@
 	width: 100%;
 	height: 100%;
 
-	z-index: 2;
+	z-index: 4;
 
 }
 .loader {
   position: absolute;
   left: 50%;
   top: 50%;
-  z-index: 2;
+  z-index: 5;
   width: 5vw;
   height: 5vw;
   margin: -2.5vw 0 0 -2.5vw;
@@ -268,6 +268,55 @@ html[xmlns] .clearfix {
 
 	font-size: 2vw;
 }
+#new_recording{
+	position: absolute;
+	margin-left: 1vw;
+	left:24.5vw;
+	width: 50vw;
+	height: 2.5vw;
+	padding-left: 0.5vw;
+	padding-right: 0px;
+}
+.audio_button{
+	position: absolute;
+	background-position: center;
+	background-size: cover;
+	z-index: 2;
+
+	border-radius: 50%;
+}
+#record_button{
+	width: 3.5vw;
+	height: 3.5vw;
+	transform: translate(-25%, -10%);
+	background-image: url("../imgs/microphone_icon.png");
+}
+.play_button{
+	background-image: url("../imgs/play.png");
+
+	width: 2.5vw;
+	height: 2.5vw;
+	transform: translate(-25%, -2%);
+}
+.audio_bar{
+	transform: translateY(.75vw);
+	z-index: 1;
+	height: 1vw;
+	background-color: black;
+}
+
+#data_type{
+	position: absolute;
+	left:75vw;
+	width:6vw;
+	height: 3vw;
+	padding-left: 0.5vw;
+	padding-right: 0.5vw;
+
+	border-radius: 5px;
+
+	font-size: 1.5vw;
+}
 #clear_all{
 	position: absolute;
 	right:0vw;
@@ -312,12 +361,17 @@ html[xmlns] .clearfix {
 	height: 6%;
 	padding-bottom: 1vw
 }
-
 .remove_col button{
 	width: 100%;
 	height: 100%;
 
 }
+
+.audio{
+	width:100%;
+	height:100%;
+}
+
 #submit_all{
 	min-width:6vw;
 	height: 3vw;

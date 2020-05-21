@@ -34,8 +34,16 @@
 			<div id="new_QA">
 				<button id="submit_new" onclick="submitNewQA()">+</button>
 				<input id="new_question" type="text" placeholder="Question"/>
-				<input id="new_answer" type="text" placeholder="Answer"/>
-				<button class="invisible" id="clear_all" onclick="clearAll()">Clear</button>
+				<input class='shown_content' id="new_answer" type="text" placeholder="Answer"/>
+				<div class='hidden_content' id="new_recording">
+					<div class='audio_button' id='record_button' onclick='recordVoice()'></div>
+					<div class='audio_bar' id='recording_bar'></div>
+				</div>
+				<select id="data_type" onchange="dtype_change()">
+					<option value="text">Text</option>
+					<option value="voice">Voice</option>
+				</select>
+				<button class="hidden_content" id="clear_all" onclick="clearAll()">Clear</button>
 			</div>
 			<br>
 			<hr id='hor_bar'>
@@ -43,7 +51,7 @@
 			<div id="set_QA">
 			</div>
 			<div>
-				<button class="invisible" id="submit_all" onclick="submitQA()">Done</button>
+				<button class="hidden_content" id="submit_all" onclick="submitQA()">Done</button>
 			</div>
 			<div id="myModal" class="modal">
 				<div id='popup_load_screen' class='shown_content'>
@@ -63,6 +71,7 @@
 		     https://firebase.google.com/docs/web/setup#available-libraries -->
 		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-analytics.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-database.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-storage.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-auth.js"></script>
 
 		<!-- TensorFlow.js -->

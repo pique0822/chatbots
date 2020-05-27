@@ -15,6 +15,10 @@
 				<input id='chatbot_id' type="text" maxlength="6" size="6"></input>
 			</div>
 			<script>
+				document.body.style.webkitTransform =  'scale(1)';
+				document.body.style.msTransform =   'scale(100)';
+				document.body.style.transform = 'scale(1)';
+				document.body.style.zoom = screen.logicalXDPI / screen.deviceXDPI;
 				function newChatbot(){
 					window.location.href = 'new_chatbot.html';
 				};

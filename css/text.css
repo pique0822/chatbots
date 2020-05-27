@@ -8,6 +8,17 @@ body {
 	transform: translateY(-50%);
 }
 
+.button-text{
+	transform: translateY(-100%);
+	margin: 0;
+}
+
+.hcenter{
+	position:absolute;
+	left: 50%;
+	transform: translatex(-50%);
+}
+
 .hide_overflow{
 	overflow: hidden;
 }

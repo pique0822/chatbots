@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html dir="ltr">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Personal Chatbot</title>
+		<link type='text/css' rel="stylesheet" href="css/main.css" />
+		<link type='text/css' rel="stylesheet" href="css/text.css" />
+	</head>
+	<body>
+			<div class='two-button' id='new_chatbot' onclick="newChatbot()">
+				<h1 class='button-text vcenter hcenter'>New Chatbot</h1>
+			</div>
+			<div class='two-button' id='load_chatbot' onclick="loadChatbot()">
+				<h1 class='button-text vcenter hcenter' id='load-text'>Load Chatbot</h1>
+				<input id='chatbot_id' type="text" maxlength="6" size="6"></input>
+			</div>
+			<script>
+				function newChatbot(){
+					window.location.href = 'new_chatbot.html';
+				};
+				function loadChatbot(){
+					var elem = document.getElementById('chatbot_id');
+					var val = elem.value;
+					if(val.length == 6)
+					{
+						window.location.href = 'chatbot.html?id='+val;
+
+					}
+				};
+				var input = document.getElementById("chatbot_id");
+				input.addEventListener("keyup", function(event) {
+				  // Number 13 is the "Enter" key on the keyboard
+				  if (event.keyCode === 13) {
+
+				    event.preventDefault();
+				    document.getElementById("load_chatbot").click();
+						document.activeElement.blur();
+				  }
+				});
+			</script>
+	</body>
+</html>

@@ -1,5 +1,40 @@
 const intensity_threshold = 0.6;
 
+function loadAudio(ref_loc, element_id){
+  var outURL = '';
+  firebase.storage().ref().child(ref_loc).getDownloadURL().then(function(url) {
+  // `url` is the download URL for 'images/stars.jpg'
+
+  // This can be downloaded directly:
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = 'blob';
+  xhr.onload = function(event) {
+    var blob = xhr.response;
+  };
+  xhr.open('GET', url);
+  xhr.send();
+
+  console.log(url);
+  // Or inserted into an <img> element:
+
+  document.getElementById(element_id).src=url;
+}).catch(function(error) {
+  // Handle any errors
+  console.log(error);
+});
+return outURL;
+}
+
+function validURL(str) {
+  var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  return !!pattern.test(str);
+}
+
 async function pageLoaded() {
 
   let promise = new Promise((resolve, reject) => {
@@ -117,19 +152,25 @@ function similarity(a, b) {
 }
 
 function readMe(el){
-	var msg = new SpeechSynthesisUtterance(el.innerText);
-	if(document.documentElement.lang == 'en')
-	{
-		msg.lang = 'en-US';
-		var voices = window.speechSynthesis.getVoices();
-		msg.voice = voices.filter(function(voice) { return voice.lang == 'en-US'; })[0];
-	}else if (document.documentElement.lang == 'es') {
-		msg.lang = 'es-MX';
-		var voices = window.speechSynthesis.getVoices();
-		msg.voice = voices.filter(function(voice) { return voice.lang == 'es-MX'; })[0];
-	}
+  if(el.innerText.length > 0)
+  {
+    var msg = new SpeechSynthesisUtterance(el.innerText);
+  	if(document.documentElement.lang == 'en')
+  	{
+  		msg.lang = 'en-US';
+  		var voices = window.speechSynthesis.getVoices();
+  		msg.voice = voices.filter(function(voice) { return voice.lang == 'en-US'; })[0];
+  	}else if (document.documentElement.lang == 'es') {
+  		msg.lang = 'es-MX';
+  		var voices = window.speechSynthesis.getVoices();
+  		msg.voice = voices.filter(function(voice) { return voice.lang == 'es-MX'; })[0];
+  	}
 
-	window.speechSynthesis.speak(msg);
+  	window.speechSynthesis.speak(msg);
+  } else {
+    el.getElementsByTagName("audio")[0].play()
+  }
+
 }
 
 function submitQuery(){
@@ -252,6 +293,7 @@ if (!('webkitSpeechRecognition' in window)) {
       upgrade();
       return;
     }
+    console.log(event);
     for (var i = event.resultIndex; i < 1; ++i) {
       if (event.results[i].isFinal) {
         final_transcript = event.results[i][0].transcript;
@@ -265,65 +307,102 @@ if (!('webkitSpeechRecognition' in window)) {
   };
 }
 
-var SESSION_ID = extract_var('id').toUpperCase();
-document.title = "Chatbot "+SESSION_ID;
-var database = firebase.database();
+async function init(){
+  var SESSION_ID = extract_var('id').toUpperCase();
+  document.title = "Chatbot "+SESSION_ID;
+  var lang = "";
+  var QA = {};
+  var color = '#FFFFFF';
+  var lighter_color = color;
+  var darker_color = pSBC(-0.5,color);
 
-var lang = "";
-var QA = {};
-var color = '#FFFFFF';
-var lighter_color = color;
-var darker_color = pSBC(-0.5,color);
-firebase.database().ref('chatbot_ids/' + SESSION_ID).once('value').then(function(snapshot) {
-	try{
-		QA = snapshot.val().QA;
-		lang = snapshot.val().lang;
-		title = snapshot.val().title;
-		color = snapshot.val().color;
+  var voice_qids = [];
+  firebase.database().ref('chatbot_ids/' + SESSION_ID).once('value').then(function(snapshot) {
+  	try{
+  		QA = snapshot.val().QA;
+  		lang = snapshot.val().lang;
+  		title = snapshot.val().title;
+  		color = snapshot.val().color;
 
-    set_text_color(color);
-		document.body.style.backgroundColor = color;
-		darker_color = pSBC(-0.75,color);
-		lighter_color = pSBC(0.75,color);
+      set_text_color(color);
+  		document.body.style.backgroundColor = color;
+  		darker_color = pSBC(-0.85,color);
+  		lighter_color = pSBC(0.75,color);
 
-		document.getElementById("chatbot_title").innerHTML = addInvalidSymbols(title);
+  		document.getElementById("chatbot_title").innerHTML = addInvalidSymbols(title);
 
-		document.documentElement.lang = lang;
-		document.getElementById("submit_query").innerHTML = language_vars[lang]['submit_button'];
+  		document.documentElement.lang = lang;
+  		document.getElementById("submit_query").innerHTML = language_vars[lang]['submit_button'];
 
-    document.getElementById('query').placeholder = language_vars[lang]['input_placeholder'];
+      document.getElementById('query').placeholder = language_vars[lang]['input_placeholder'];
 
-		load_questions = Object.keys(QA);
+  		load_questions = Object.keys(QA);
 
-		var q_list = document.getElementById("questions");
+  		var q_list = document.getElementById("questions");
 
-		const darker_style = "color: white; background-color: "+darker_color + '; border-color: '+darker_color+';';
-		const lighter_style = "background-color: "+lighter_color + '; border-color: '+lighter_color+';';
-		var all_questions = "";
-		for(var q_id = 0; q_id < load_questions.length; q_id++)
-		{
-			var item = "<div id='Q"+q_id+"' class='question Block hidden_content' style='"+lighter_style+"' onclick=toggleVisibility("+q_id+")><div class='vcenter'>"+addInvalidSymbols(load_questions[q_id])+"</div></div><div id='A"+q_id+"' onclick=readMe(this) class='answer Block hidden_content'  style='"+darker_style+"'><div class='vcenter'>"+addInvalidSymbols(QA[load_questions[q_id]][0])+"</div></div>";
-			all_questions += item;
+  		const darker_style = "color: white; background-color: "+darker_color + '; border-color: '+darker_color+';';
+  		const lighter_style = "background-color: "+lighter_color + '; border-color: '+lighter_color+';';
+  		var all_questions = "";
+  		for(var q_id = 0; q_id < load_questions.length; q_id++)
+  		{
+        if(QA[load_questions[q_id]][2] != null)
+        {
+          var item = "<div id='Q"+q_id+"' class='question Block hidden_content' style='"+lighter_style+"' onclick=toggleVisibility("+q_id+")><div class='vcenter'>"+addInvalidSymbols(load_questions[q_id])+"</div></div><div id='A"+q_id+"' onclick=readMe(this) class='answer Block hidden_content'  style='"+darker_style+"'><div class='vcenter'>"+load_answer_text(QA[load_questions[q_id]][0])+"</div></div>";
+    			all_questions += item;
 
-			if(question_embeddings == null)
-			{
-				question_embeddings = tf.tensor([QA[load_questions[q_id]][1]]);
-				answer_embeddings = tf.tensor([QA[load_questions[q_id]][2]]);
-			} else {
-				question_embeddings = tf.concat([question_embeddings, [QA[load_questions[q_id]][1]]], 0);
-				answer_embeddings = tf.concat([answer_embeddings, [QA[load_questions[q_id]][2]]], 0);
-			}
-		}
-		q_list.innerHTML = all_questions;
+    			if(question_embeddings == null)
+    			{
+    				question_embeddings = tf.tensor([QA[load_questions[q_id]][1]]);
+    				answer_embeddings = tf.tensor([QA[load_questions[q_id]][2]]);
+    			} else {
+    				question_embeddings = tf.concat([question_embeddings, [QA[load_questions[q_id]][1]]], 0);
+    				answer_embeddings = tf.concat([answer_embeddings, [QA[load_questions[q_id]][2]]], 0);
+    			}
+        } else {
+          // voice
 
-    pageLoaded();
-	} catch(e)
-	{
-    console.log(e);
-		alert('This is not a valid Chatbot!');
-	}
+          var item = "<div id='Q"+q_id+"' class='question Block hidden_content' style='"+lighter_style+"' onclick=toggleVisibility("+q_id+")><div class='vcenter'>"+addInvalidSymbols(load_questions[q_id])+"</div></div><div id='A"+q_id+"' onclick=readMe(this) class='answer Block hidden_content'  style='"+darker_style+"'><div class='vcenter'><audio controls id='voice_"+q_id+"' ></audio></div></div>";
+    			all_questions += item;
 
-});
+          loadAudio('chatbot_ids/'+SESSION_ID+'/voices/'+QA[load_questions[q_id]][0],'voice_'+q_id);
+
+    			if(question_embeddings == null)
+    			{
+    				question_embeddings = tf.tensor([QA[load_questions[q_id]][1]]);
+    				answer_embeddings = question_embeddings;
+    			} else {
+    				question_embeddings = tf.concat([question_embeddings, [QA[load_questions[q_id]][1]]], 0);
+    				answer_embeddings = question_embeddings;
+    			}
+        }
+
+  		}
+  		q_list.innerHTML = all_questions;
+
+      pageLoaded();
+
+  	} catch(e)
+  	{
+      console.log(e);
+  		alert('This is not a valid Chatbot!');
+  	}
+
+  });
+}
+function load_answer_text(txt){
+  var new_text = addInvalidSymbols(txt);
+  var arr = new_text.split(' ');
+  var final_text = "";
+  for(var i = 0; i<arr.length; i++)
+  {
+    sub_text = arr[i];
+    if(validURL(sub_text)){
+      sub_text = "<a href='"+sub_text+"'>Link</a>";
+    }
+    final_text += (sub_text + ' ');
+  }
+  return final_text.trim();
+}
 
 var input = document.getElementById("query");
 input.addEventListener("keyup", function(event) {
@@ -336,8 +415,7 @@ input.addEventListener("keyup", function(event) {
   }
 });
 
-function toggle_questions(change_show_all)
-{
+function toggle_questions(change_show_all){
   if(change_show_all)
   {
     show_all_questions = !show_all_questions;
@@ -442,3 +520,5 @@ function set_text_color(color){
 
   console.log(intensity);
 }
+
+init();

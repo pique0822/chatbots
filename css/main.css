@@ -1,0 +1,99 @@
+body{
+	position: relative;
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
+	background-color: black;
+	height: 100vh;
+}
+
+.two-button{
+	height: 100%;
+	width: 50%;
+
+	opacity: 1;
+
+	color: white;
+}
+
+.two-button:hover{
+	opacity: 1;
+	cursor: pointer;
+}
+
+#new_chatbot{
+	display: none;
+}
+
+#load_chatbot{
+	position: absolute;
+
+	width:100%;
+	right: 0;
+	top: 0;
+	background-color: #2ecc71;
+}
+
+#load_chatbot > h1{
+	transform: translate(-50%,-100%);
+	font-size: 1.5em;
+	display: block;
+}
+
+#chatbot_id{
+	position: absolute;
+	width: 75%;
+	top:50%;
+	left:50%;
+
+	font-size: 3em;
+	text-align: center;
+
+	transform: translateX(-50%);
+}
+
+@media only screen and (min-width: 768px) {
+
+
+
+
+	#new_chatbot{
+		position: absolute;
+		left: 0;
+		top: 0;
+		background-color: #1abc9c;
+	}
+
+	#load_chatbot{
+		position: absolute;
+		right: 0;
+		top: 0;
+		background-color: #2ecc71;
+	}
+	#load_chatbot:hover > #chatbot_id{
+		transition: display 5s linear;
+		display: block;
+	}
+	#load_chatbot:hover > h1{
+		display: none;
+		transition: font-size 0.05s ease, transform 0.5s ease;
+		transform: translate(-50%,-100%);
+		font-size: 1em;
+		display: block;
+	}
+
+	#chatbot_id{
+		position: absolute;
+		width: 75%;
+		top:50%;
+		left:50%;
+
+		font-size: 3em;
+		text-align: center;
+
+		transform: translateX(-50%);
+
+		display: none;
+	}
+
+}

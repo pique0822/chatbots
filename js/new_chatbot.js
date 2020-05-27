@@ -2,17 +2,23 @@ var questions_so_far = {};
 var question_sequence = [];
 var q_vec_dict = {};
 var a_vec_dict = {};
+var recording = false;
+var recorder = null;
+const intensity_threshold = 0.5;
 
-const intensity_threshold = 0.6;
+function blobToFile(theBlob, fileName){
+    //A Blob() is almost a File() - it's just missing the two properties below which we will add
+    return new File([theBlob], fileName);
+}
 
 async function pageLoaded() {
-
   let promise = new Promise((resolve, reject) => {
     setTimeout(() => resolve("done!"), 1500)
   });
 
   let result = await promise; // wait until the promise resolves (*)
 
+  recorder = await recordAudio();
   document.body.classList.remove('hide_overflow');
 
   document.getElementById('loading_screen').classList.remove('shown_content');
@@ -21,6 +27,44 @@ async function pageLoaded() {
   document.getElementById('main_content').classList.add('shown_content');
   document.getElementById('main_content').classList.remove('hidden_content');
 }
+
+const recordAudio = () => {
+  return new Promise(resolve => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
+        var audioChunks = [];
+
+        mediaRecorder.addEventListener("dataavailable", event => {
+          audioChunks.push(event.data);
+        });
+
+        const start = () => {
+          audioChunks = [];
+          mediaRecorder.start();
+        };
+
+        const stop = () => {
+          return new Promise(resolve => {
+            mediaRecorder.addEventListener("stop", () => {
+              const audioBlob = new Blob(audioChunks);
+              const audioUrl = URL.createObjectURL(audioBlob);
+              const audio = new Audio(audioUrl);
+              const play = () => {
+                audio.play();
+              };
+
+              resolve({ audioBlob, audioUrl, play });
+            });
+
+            mediaRecorder.stop();
+          });
+        };
+
+        resolve({ start, stop });
+      });
+  });
+};
 
 // p is percent (+ is lighter, - is darker, c0 is the color)
 const pSBC=(p,c0,c1,l)=>{
@@ -89,27 +133,38 @@ function extract_var(name){
 	return value
 }
 
-function getRandomInt(max) {
+function getRandomInt(max){
   return Math.floor(Math.random() * Math.floor(max));
 }
 
 function populate_table(ls, tbl){
 	table = document.getElementById("set_QA");
-	document.getElementById("submit_all").classList.add('invisible');
-	document.getElementById("clear_all").classList.add('invisible');
+	document.getElementById("submit_all").classList.add('hidden_content');
+	document.getElementById("clear_all").classList.add('hidden_content');
 
 	stylization = 'font-weight: none; text-align: left;'
 
 	inner = ""
 	if(ls.length > 0){
 		inner = "<div class='row'><div class='question_col'><span class='table_span'><b>"+language_vars[current_language]["question_title"]+"</b></span></div><div class='answer_col'><span class='table_span'><b>"+language_vars[current_language]["answer_title"]+"</b></span></div><div class='remove_col clearfix'> </div></div>";
-		document.getElementById("submit_all").classList.remove('invisible');
-		document.getElementById("clear_all").classList.remove('invisible');
+		document.getElementById("submit_all").classList.remove('hidden_content');
+		document.getElementById("clear_all").classList.remove('hidden_content');
 	}
 
 	for(var q_id = 0; q_id < ls.length; q_id++)
 	{
-		inner += "<div id='q"+q_id+"' class='row'><div class='question_col'><span class='table_span'>"+ls[q_id]+"</span></div><div class='answer_col'><span class='table_span'>"+questions_so_far[ls[q_id]]+"</span></div><div class='remove_col'><button id='remove' onclick='remove_qa("+q_id+")'>-</button></div><div id='clear' style='clear:both;''></div></div>";
+    var type = questions_so_far[ls[q_id]][0]
+    var obj = questions_so_far[ls[q_id]][1]
+    console.log(questions_so_far[ls[q_id]]);
+    console.log(questions_so_far[ls[q_id]]);
+
+    if(type == 'text')
+    {
+      inner += "<div id='q"+q_id+"' class='row'><div class='question_col'><span class='table_span'>"+ls[q_id]+"</span></div><div class='answer_col'><span class='table_span'>"+obj+"</span></div><div class='remove_col'><button id='remove' onclick='remove_qa("+q_id+")'>-</button></div><div id='clear' style='clear:both;''></div></div>";
+    }
+    else if (type == 'voice') {
+      inner += "<div id='q"+q_id+"' class='row'><div class='question_col'><span class='table_span'>"+ls[q_id]+"</span></div><div class='answer_col'><div class='audio'><div class='audio_button play_button' onclick='playRecording("+q_id+")'></div><div class='audio_bar'></div></div></div><div class='remove_col'><button id='remove' onclick='remove_qa("+q_id+")'>-</button></div><div id='clear' style='clear:both;''></div></div>";
+    }
 
 
 	}
@@ -137,15 +192,15 @@ function remove_qa(id){
 		delete questions_so_far[removed[0]];
 	}
 
-	populate_table(question_sequence, questions_so_far);
+	set_text_color(random_color);
 }
 
-function getEmbeddings(this_q, this_a){
+function getEmbeddings(this_q){
 	return new Promise(function(resolve, reject) {
 		// Universal Sentence Encoder
 		use.load().then(model => {
 			// Embed an array of sentences.
-			const sentences = [this_q, this_a];
+			const sentences = [this_q];
 			console.log(this_q)
 			model.embed(sentences).then(embeddings => {
 				// `embeddings` is a 2D tensor consisting of the 512-dimensional embeddings for each sentence.
@@ -166,16 +221,35 @@ async function submitQA(){
 	console.log("Parsing questions and answers...")
 	var information_by_question = {};
 
+  var voices = {};
 	for(var q_id = 0; q_id < question_sequence.length; q_id++)
 	{
 		var this_q = question_sequence[q_id];
-		var this_a = questions_so_far[this_q];
+		var this_type = questions_so_far[this_q][0];
+    var this_a = questions_so_far[this_q][1];
 
-		const this_out = await getEmbeddings(this_q, this_a);
-		const thisq_vec=this_out.gather(tf.tensor1d([0], 'int32')).dataSync();
-		const thisa_vec=this_out.gather(tf.tensor1d([1], 'int32')).dataSync();
+    console.log(this_type);
+    if(this_type == 'text')
+    {
+      var this_out = await getEmbeddings(this_q);
+  		const thisq_vec=this_out.gather(tf.tensor1d([0], 'int32')).dataSync();
+      this_out = await getEmbeddings(this_a);
+  		const thisa_vec=this_out.gather(tf.tensor1d([0], 'int32')).dataSync();
 
-		information_by_question[removeInvalidSymbols(this_q)] = [removeInvalidSymbols(this_a), thisq_vec, thisa_vec];
+      information_by_question[removeInvalidSymbols(this_q)] = [removeInvalidSymbols(this_a), thisq_vec, thisa_vec];
+    } else if (this_type=='voice') {
+      const this_out = await getEmbeddings(this_q);
+  		const thisq_vec=this_out.gather(tf.tensor1d([0], 'int32')).dataSync();
+  		const thisa_vec=null;
+
+
+
+      information_by_question[removeInvalidSymbols(this_q)] = ['voice_'+q_id, thisq_vec, thisa_vec];
+
+      voices['voice_'+q_id] = this_a;
+    }
+
+
 	}
 	console.log('Submitting to '+random_id);
 
@@ -194,6 +268,13 @@ async function submitQA(){
 	var database = firebase.database();
 	firebase.database().ref('chatbot_ids/' + random_id).set({'QA':information_by_question,"lang":lang,"time":new Date().getTime(), "title":chatbot_title, "color":random_color});
 
+  const all_voices = Object.keys(voices);
+  for(var v_id = 0; v_id < all_voices.length; v_id++)
+  {
+    var voice = voices[all_voices[v_id]];
+    firebase.storage().ref('chatbot_ids/'+random_id+'/voices/'+all_voices[v_id]).put(voice.audioBlob);
+  }
+
   document.getElementById('popup_id').innerHTML = random_id;
   document.getElementById('popup_text').innerHTML = language_vars[current_language]['popup_text'];
 
@@ -210,7 +291,7 @@ async function submitQA(){
 
 function languageChange(){
 	current_language = document.getElementById("language").value;
-	populate_table(question_sequence, questions_so_far);
+	set_text_color(random_color);
 
 	document.getElementById('new_question').placeholder = language_vars[current_language]['placeholder_question'];
 	document.getElementById('new_answer').placeholder = language_vars[current_language]['placeholder_answer'];
@@ -224,7 +305,7 @@ function clearAll(){
 	questions_so_far = {};
 	question_sequence = [];
 
-	populate_table(question_sequence, questions_so_far);
+	set_text_color(random_color);
 }
 
 function submitNewQA(){
@@ -238,10 +319,10 @@ function submitNewQA(){
 		newQ.value = "";
 		newA.value = "";
 
-		questions_so_far[question] = answer;
+		questions_so_far[question] = ['text', answer];
 		question_sequence.unshift(question);
 
-		populate_table(question_sequence, questions_so_far);
+		set_text_color(random_color);
 	}
 }
 
@@ -302,7 +383,7 @@ if(window.location.href.indexOf('?id=') >= 0 && (window.location.href.length - w
 			question_sequence = Object.keys(QA);
 			for(var q_id = 0; q_id < question_sequence.length; q_id++)
 			{
-				questions_so_far[addInvalidSymbols(question_sequence[q_id])] = addInvalidSymbols(QA[question_sequence[q_id]][0]);
+				questions_so_far[addInvalidSymbols(question_sequence[q_id])] = [QA[question_sequence[q_id]][0], addInvalidSymbols(QA[question_sequence[q_id]][1])];
 				question_sequence[q_id] = addInvalidSymbols(question_sequence[q_id]);
 			}
       document.getElementById("favcolor").value = random_color;
@@ -313,6 +394,7 @@ if(window.location.href.indexOf('?id=') >= 0 && (window.location.href.length - w
 
       document.getElementById('chatbot_id').value = language_vars[current_language]['chatbot_title'];
 
+      document.getElementById("favcolor").value = random_color;
       set_text_color(random_color);
 		}
 	});
@@ -439,11 +521,12 @@ function hex2num(hex){
 
 function set_text_color(color){
 
+  darker_color = pSBC(-0.5,color);
+  darker_color = pSBC(-0.85,color);
+  lighter_color = pSBC(0.5,color);
+  lightest_color = pSBC(0.85,color);
   document.body.style.backgroundColor = color;
-  document.getElementById('hor_bar').style.backgroundColor = pSBC(-0.5, color);
-  document.getElementById('hor_bar').style.borderColor = pSBC(-0.5, color);
-	document.getElementById('chatbot_title').style.borderBottomColor = pSBC(-0.5, color);
-  document.getElementById('new_question').style.boxShadowColor = pSBC(-0.5, color);
+
 
   populate_table(question_sequence, questions_so_far);
 
@@ -463,12 +546,82 @@ function set_text_color(color){
     document.getElementById("chatbot_title").style.color='black';
     document.getElementById("language_label").style.color='black';
 
+    document.getElementById('hor_bar').style.backgroundColor = darker_color;
+    document.getElementById('hor_bar').style.borderColor = darker_color;
+    var elements = document.querySelectorAll('.audio_bar');
+    for(var i=0; i<elements.length; i++){
+        elements[i].style.backgroundColor = darker_color;
+    }
+  	document.getElementById('chatbot_title').style.borderBottomColor = darker_color;
+    document.getElementById('new_question').style.boxShadowColor = darker_color;
+
   } else {
     document.getElementById("chatbot_id").style.color='white';
     document.getElementById("chatbot_title").style.color='white';
     document.getElementById("language_label").style.color='white';
 
+    document.getElementById('hor_bar').style.backgroundColor = lighter_color;
+    document.getElementById('hor_bar').style.borderColor = lighter_color;
+    var elements = document.querySelectorAll('.audio_bar');
+    for(var i=0; i<elements.length; i++){
+        elements[i].style.backgroundColor = lighter_color;
+    }
+  	document.getElementById('chatbot_title').style.borderBottomColor = lighter_color;
+    document.getElementById('new_question').style.boxShadowColor = lighter_color;
+
   }
 
   console.log(intensity);
+}
+
+function dtype_change(){
+  var value = document.getElementById('data_type').value;
+  if(value == 'text')
+  {
+    document.getElementById('new_recording').classList.remove('shown_content');
+    document.getElementById('new_recording').classList.add('hidden_content');
+
+    document.getElementById('new_answer').classList.add('shown_content');
+    document.getElementById('new_answer').classList.remove('hidden_content');
+  }else if (value == 'voice') {
+    document.getElementById('new_answer').classList.remove('shown_content');
+    document.getElementById('new_answer').classList.add('hidden_content');
+
+    document.getElementById('new_recording').classList.add('shown_content');
+    document.getElementById('new_recording').classList.remove('hidden_content');
+  }
+}
+
+function playRecording(q_id)
+{
+  const audio = questions_so_far[question_sequence[q_id]][1];
+  audio.play();
+}
+
+async function recordVoice(){
+  console.log('recording');
+  if(recording)
+  {
+    document.getElementById('record_button').style.backgroundImage="url('imgs/microphone_icon.png')";
+    recording = false;
+
+    const audio = await recorder.stop();
+    newQ = document.getElementById("new_question");
+
+  	if(newQ.value.length > 0){
+  		question = newQ.value.trim();
+
+  		newQ.value = "";
+
+  		questions_so_far[question] = ['voice',audio];
+  		question_sequence.unshift(question);
+
+  		set_text_color(random_color);
+  	}
+  }else{
+    document.getElementById('record_button').style.backgroundImage="url('imgs/microphone-recording_icon.png')";
+    recording = true;
+
+    recorder.start();
+  }
 }
